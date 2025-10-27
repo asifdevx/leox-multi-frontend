@@ -6,8 +6,8 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { io } from 'socket.io-client';
 
-const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-const socket = io(`${protocol}://leox-backend.onrender.com`, {
+
+const socket = io(`wss://leox-backend.onrender.com`, {
   withCredentials: true,
   transports: ['websocket'],
 });
