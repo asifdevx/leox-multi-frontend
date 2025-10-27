@@ -6,10 +6,12 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { io } from 'socket.io-client';
 
-const socket = io('http://leox-backend.onrender.com', {
+const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+const socket = io(`${protocol}://leox-backend.onrender.com`, {
   withCredentials: true,
   transports: ['websocket'],
 });
+
 
 export default function SocketListener() {
   const dispatch = useDispatch<AppDispatch>();
