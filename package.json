@@ -19,7 +19,6 @@
     "@types/aos": "^3.0.7",
     "@types/ethereum-blockies": "^0.1.2",
     "@types/react-blockies": "^1.4.4",
-  
     "aos": "^2.3.4",
     "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
@@ -48,7 +47,6 @@
     "wagmi": "^2.17.5"
   },
   "devDependencies": {
-    "@react-native-async-storage/async-storage": "^2.2.0",
     "@types/node": "^24.6.1",
     "@types/react": "^18",
     "@types/react-dom": "^18",
