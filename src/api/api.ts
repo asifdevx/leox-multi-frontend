@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_CALL = "http://leox-backend.onrender.com/api";
+const API_CALL = "https://leox-backend.onrender.com/api";
 
 export const getFeeHistory = async () => {
   const { data } = await axios.get(`${API_CALL}/latestFees`);

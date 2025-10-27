@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const GRAPHQL_ENDPOINT = "http://leox-backend.onrender.com/g";
+const GRAPHQL_ENDPOINT = "https://leox-backend.onrender.com/g";
 
 export async function fetchGraphQL<T>(
   query: string,
