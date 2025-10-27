@@ -163,7 +163,7 @@ interface ProfileData {
 }
 
 interface ProfilePageProps {
-  username:string,
+  username?:string,
   
 }
 
