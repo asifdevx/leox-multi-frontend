@@ -7,7 +7,6 @@ import Image from "next/image";
 import { handleCopy } from "../../../utils/handleCopy";
 import { WalletBalance } from "./WalletBalance";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
-
 import { useDispatch } from "react-redux";
 import { getUserInfo } from "@/reducer/userSlice";
 import AddUserName from "./AddUserName";
