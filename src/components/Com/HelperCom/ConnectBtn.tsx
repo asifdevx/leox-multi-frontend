@@ -1,78 +1,104 @@
-import React, { useState } from "react";
-import { Dialog } from "@headlessui/react";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { shortenAddress } from "../ui/ShortenAddress";
+import React, { useEffect, useState } from "react";
+import {  Dialog } from "@headlessui/react";
 import { IoMdClose } from "react-icons/io";
 import { GoCopy } from "react-icons/go";
 import { FaExternalLinkAlt } from "react-icons/fa";
-import blockies from "ethereum-blockies";
 import Image from "next/image";
-import { handleCopy } from "./handleCopy";
+import { handleCopy } from "../../../utils/handleCopy";
 import { WalletBalance } from "./WalletBalance";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
+
+import { useDispatch } from "react-redux";
+import { getUserInfo } from "@/reducer/userSlice";
+import AddUserName from "./AddUserName";
+import Link from "next/link";
+import ProfileIcon from "./ProfileIcon";
+import { AppDispatch } from "@/components/store/store";
+import { shortenAddress } from "@/utils/ShortenAddress";
+import Button from "@/components/ui/Button";
 
 const ConnectBtn: React.FC = () => {
-  const { address, isConnected, isConnecting, isReconnecting } = useAccount();
+  const { address, isConnected, isConnecting, isReconnecting, status } =
+    useAccount();
   const { connectors, connectAsync } = useConnect();
-  const { disconnectAsync } = useDisconnect();
+  const dispatch = useDispatch<AppDispatch>();
+  const { disconnect } = useDisconnect();
   const { symbol, formate } = WalletBalance();
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userRejected, setUserRejected] = useState(false);
+  const [isFirstTimeLogin, setIsFirstTimeLogin] = useState(false);
 
   const metaMaskConnector = connectors.find((c) => c.name === "MetaMask");
 
-  const icon =
-    address &&
-    blockies
-      .create({ seed: address.toLowerCase(), size: 8, scale: 4 })
-      .toDataURL();
+  
+
+  useEffect(() => {
+    async function fatch() {
+      if (address) {
+        const data = await dispatch(getUserInfo({ address })).then(
+          (res: any) => {
+            const user = res.payload;
+            console.log("userData",user);
+            
+            if (user?.isFirstTime) {
+              console.log("true");
+              setIsFirstTimeLogin(true);
+            }
+          }
+        );
+      }
+    }
+    fatch();
+  }, [address]);
 
   const handleConnect = async (connector: any) => {
     if (isConnected) {
       setIsModalOpen(true);
       return;
     }
-    try {
+    if (isConnecting || isReconnecting) {
       setIsModalOpen(true);
+      return;
+    }
+    setIsModalOpen(true);
+    try {
       await connectAsync({ connector });
-      setIsModalOpen(false);
+
       setUserRejected(false);
     } catch (error: any) {
       if (error?.name === "ConnectorAlreadyConnectedError") {
         setIsModalOpen(true);
+        setUserRejected(false);
         return;
       }
-      if (error?.message?.includes("User rejected")) {
+      if (error?.code === 4001 || error?.message?.includes("User rejected")) {
         setUserRejected(true);
-        setIsModalOpen(true);
       } else {
         setUserRejected(false);
         setIsModalOpen(false);
       }
-    }
-  };
-
-  const handleDisconnect = async () => {
-    try {
-      await disconnectAsync();
-    } catch (err) {
-      console.error("Disconnection failed:", err);
     } finally {
       setIsModalOpen(false);
     }
   };
 
+  const handleDisconnect = () => {
+    disconnect();
+    setIsModalOpen(false);
+  };
+
+  const title =
+    isConnected && address ? shortenAddress(address) : "Connect";
+
   return (
     <div>
       {/* Main Button */}
-      <button
-        onClick={() =>
-          isConnected ? setIsModalOpen(true) : handleConnect(metaMaskConnector)
-        }
-        className="px-5 py-2 bg-gradient-to-r from-blueGradientStart to-blueGradientEnd text-white rounded-lg font-semibold text-sm shadow-md hover:scale-105 transition-transform duration-200"
-      >
-        {isConnected && address ? shortenAddress(address) : "Connect Wallet"}
-      </button>
+
+      <Button
+        title={title}
+        handleClick={() => handleConnect(metaMaskConnector)}
+        othercss="px-3 py-2 text-base md:text-lg rounded-lg"
+      />
 
       {/* Modal */}
       <Dialog
@@ -102,6 +128,7 @@ const ConnectBtn: React.FC = () => {
                         src="/metamask.png"
                         width={55}
                         height={54}
+                        fetchPriority="high"
                         alt="MetaMask"
                         className="animate-pulse pointer-events-none"
                       />
@@ -121,7 +148,6 @@ const ConnectBtn: React.FC = () => {
                   </div>
                 )}
 
-              {/* ❌ User Rejected */}
               {userRejected && !isConnected && (
                 <div className="flex flex-col items-center gap-3 py-6">
                   <div className="relative">
@@ -129,6 +155,7 @@ const ConnectBtn: React.FC = () => {
                       src="/metamask.png"
                       width={64}
                       height={64}
+                      fetchPriority="high"
                       alt="MetaMask"
                     />
                     <span className="absolute -bottom-2 right-0 text-red-500 text-3xl">
@@ -159,18 +186,10 @@ const ConnectBtn: React.FC = () => {
                       onClick={() => setIsModalOpen(false)}
                     />
                   </div>
-                  <div className="p-2 bg-gray-800 rounded-full">
-                    <Image
-                      src={icon!}
-                      width={72}
-                      height={72}
-                      alt="Identicon"
-                      className="rounded-full"
-                    />
-                  </div>
+                <ProfileIcon width={72} height={72} address={address}/>
                   <div className="flex items-center gap-2">
                     <p className="text-2xl font-bold text-white">
-                      {shortenAddress(address)}
+                     {shortenAddress(address)} 
                     </p>
                     <GoCopy
                       className="text-white/60 cursor-pointer hover:text-white transition-colors"
@@ -180,6 +199,10 @@ const ConnectBtn: React.FC = () => {
                   <p className="text-gray-400">
                     {formate} {symbol}
                   </p>
+                  <Link href="/items/owned">
+                  <Button title="My NFTS" othercss="mt-3 flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-600 text-white hover:bg-gray-700 transition-all duration-200 shadow-md"
+                  handleClick={()=>setIsModalOpen(false)}/>
+                  </Link>
                   <button
                     onClick={() => console.log("Open explorer")}
                     className="mt-3 flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-600 text-white hover:bg-gray-700 transition-all duration-200 shadow-md"
@@ -207,6 +230,9 @@ const ConnectBtn: React.FC = () => {
           </Dialog.Panel>
         </div>
       </Dialog>
+      {isFirstTimeLogin && (
+       <AddUserName setIsFirstTimeLogin={setIsFirstTimeLogin} isFirstTimeLogin={isFirstTimeLogin} />
+      )}
     </div>
   );
 };

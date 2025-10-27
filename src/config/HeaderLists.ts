@@ -1,29 +1,70 @@
 interface HeaderLists {
-  name: string,
-  link?: string,
+  label: string,
+  route: string,
   islink: boolean, 
 }
 
 export const HeaderLists:HeaderLists[] = [
   {
-    name: "Home",
-    link: "/",
+    label: "Home",
+    route: "/",
     islink: true,
   },
   {
-    name: "Create",
-    link: "/createNFT",
+    label: "Create",
+    route: "/createNFT",
     islink: true,
   },
   {
-    name: "Buy",
-    link: "/buy",
+    label: "Buy",
+    route: "/buy",
     islink: true,
   },
   {
-    name: "drops",
-    link: "/drops",
+    label: "drops",
+    route: "/drops",
     islink: true,
   },
  
+];
+export const sidebarLinks = [
+  {
+    imgURL: "/dashboard.svg",
+    route: "/admin",
+    label: "Dashboard",
+  },
+  {
+    imgURL: "/fee.svg",
+    route: "/admin/fee",
+    label: "Fee", 
+  },
+  {
+    imgURL: "/transaction.svg",
+    route: "/admin/transactions", 
+    label: "Transaction History",
+  },
+  
+  {
+    imgURL: "/user.svg",
+    route: "/admin/users",
+    label: "User Management",
+  },
+
+  {
+    imgURL: "/analytics.svg",
+    route: "/admin/analytics",
+    label: "Analytics & Reports",
+  },
+  {
+    imgURL: "/role.svg",
+    route: "/admin/roles",
+    label: "Role Management",
+  },
+  {
+    imgURL: "/notification.svg",
+    route: "/admin/notifications",
+    label: "System Notifications",
+  },
+
+
 ];

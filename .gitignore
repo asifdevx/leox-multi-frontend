@@ -34,7 +34,17 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Ignore node_modules for both frontend and backend
+node_modules/
+
+# ignore next file 
+.next/
+.prettierignore
+.prettierrc
+settings.json
+
 # Ignore environment files
-.env
-node_modules
+/.env
+
 yarn.lock
+leox_multi.sol
