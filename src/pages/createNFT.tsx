@@ -1,31 +1,25 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/components/store/store";
 import { shortenAddress } from "@/utils/ShortenAddress";
-import { useAccount, useConnect } from "wagmi";
+import { useAccount } from "wagmi";
 import { uploadMetadataToIPFS, uploadToIPFS } from "@/utils/uploadIpfs";
 import PreviewNFT from "@/components/Com/HelperCom/PreviewNFT";
 import { createNFT } from "@/reducer/nftSlice";
 import FormInput from "@/components/Com/HelperCom/FormInput";
 import { IoCloseSharp } from "react-icons/io5";
-import { fatchFee } from "@/reducer/feeSlice";
+
 import Button from "@/components/ui/Button";
 import ConnectBtn from "@/components/Com/HelperCom/ConnectBtn";
 import FixedNFTForm from "@/components/Com/createCom/FixedNFTForm";
 import AuctionNFTForm from "@/components/Com/createCom/AuctionNFTForm";
+import { fatchMarketplaceFee } from "@/hooks/fatchMarketplaceFee";
+import { AppDispatch } from "@/components/store/store";
+import { useDispatch } from "react-redux";
 
 
 const createNft = () => {
-  const history = useSelector((state: RootState) => state.fee.history);
   const dispatch = useDispatch<AppDispatch>();
-  const fee = history.length > 0 ? history[0].fee : 0;
-  const feePercent = useMemo(() => fee, [fee]);
-  useEffect(() => {
-    console.log(feePercent);
-
-    dispatch(fatchFee());
-  }, []);
+ 
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -39,7 +33,11 @@ const createNft = () => {
   const [startingBid, setStartingBid] = useState("");
   const [duration, setDuration] = useState("");
 
+
+  const fee =fatchMarketplaceFee();
+
   const handleCreateNFT = async () => {
+    console.count("handleCreateNFT");
     if (!isConnected) return;
     setLoading(true);
 
@@ -145,6 +143,7 @@ const createNft = () => {
 
               {/* Upload */}
               <h5 className="text-white font-semibold">Upload File</h5>
+              
               <div
                 className={`${
                   preview
@@ -152,6 +151,7 @@ const createNft = () => {
                     : "h-72"
                 } border-dashed border-2 border-[#1e3350] rounded-2xl p-6 w-full flex justify-center items-center relative hover:border-[#00d1ff]/60 transition-all`}
               >
+
                 {preview ? (
                   <>
                     <img
@@ -216,7 +216,8 @@ const createNft = () => {
                     setSupply,
                   }}
                 />
-              ) : (
+           
+                ) : (
                 <AuctionNFTForm
                   value={{
                     startingBid,
@@ -245,12 +246,7 @@ const createNft = () => {
                 handleClick={handleCreateNFT}
                 othercss="rounded-lg px-3 py-3 flex items-center justify-center gap-2"
                 loading={loading}
-                title={             
-                  
-                 
-                    "Create NFT"
-                  
-                }
+                title={ "Create NFT"}
               />
             </div>
 

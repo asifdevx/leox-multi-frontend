@@ -3,6 +3,7 @@ import { cn } from "@/utils/cn";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const Button: React.FC<customBtnProps> = ({
+  
   loading = false,
   handleClick,
   title,

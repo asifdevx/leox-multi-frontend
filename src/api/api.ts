@@ -1,6 +1,8 @@
 import axios from "axios";
 
 const API_CALL = "https://leox-backend.onrender.com/api";
+// const API_CALL = "http://192.168.19.43:8000/api";
+
 const api = axios.create({
   baseURL: API_CALL,
   withCredentials: true,

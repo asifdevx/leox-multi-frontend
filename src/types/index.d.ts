@@ -88,6 +88,7 @@ interface InputProps {
   handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   icon?: ReactNode | string;
   onFocus?:()=>void
+  onBlur?:()=>void
 }
 
 type FormInputProps = {
@@ -97,8 +98,11 @@ type FormInputProps = {
   value?: string;
   icon?: string;
   inputClass?: string;
+  error?:string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFocus?:()=>void
+  onBlur?:()=>void
+
 };
 
 type SideBarItem = {
@@ -148,17 +152,15 @@ interface AddUserNameProps {
 
 
 // ---------------------- USER PROFILE   ------------------------
-type NftData ={
-  tokenId:string,name:string,image:string,price:string,
-}
+
 
 interface ProfileData {
   user : {name:string,address:string,roles:Role[],follower:number,following:number},
   nfts: {
-    owned:NftData[],
-    sale:NftData[],
-    created:NftData[],
-    sold:NftData[],
+    owned:NFT[],
+    sale:NFT[],
+    created:NFT[],
+    sold:NFT[],
   }
 }
 
@@ -269,3 +271,12 @@ interface getBidsProps {
  bids:SingleBids[];
 }
 
+
+
+////////////////////rese;ll 
+
+interface reSellNftProps {
+  tokenId:number,
+  quantity:number,
+  newPrice:number
+}

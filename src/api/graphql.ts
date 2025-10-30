@@ -1,6 +1,9 @@
 import axios from "axios";
 
 const GRAPHQL_ENDPOINT = "https://leox-backend.onrender.com/g";
+// const GRAPHQL_ENDPOINT = "http://192.168.19.43:8000/g";
+
+
 
 export async function fetchGraphQL<T>(
   query: string,
