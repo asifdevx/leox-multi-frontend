@@ -7,7 +7,8 @@ import { fatchMarketplaceFee } from '@/hooks/fatchMarketplaceFee';
 import Button from '@/components/ui/Button';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/components/store/store';
-import { reSellNft,startAuctionNft } from '@/reducer/nftSlice';
+import { reSellNft, startAuctionNft } from '@/reducer/nftSlice';
+import { useToast } from '@/hooks/useToast';
 type ListInViewProps = {
   setIsModalOpen: (isModalOpen: boolean) => void;
   specificNft: t.NFT;
@@ -26,32 +27,34 @@ const ListInView = ({ setIsModalOpen, specificNft }: ListInViewProps) => {
   const [activeTab, setActiveTab] = useState<'Fixed' | 'Auction'>('Fixed');
   //  -----------------------------Hooks ----------------------------------
   const fee = fatchMarketplaceFee();
-
+  const toast = useToast();
   //  ----------------------------function ----------------------------------
   const handleMode = useCallback(() => setIsModalOpen(false), [setIsModalOpen]);
   const priceRequire = useCallback(() => {
     if (!Number(price)) setPriceError('Enter a price');
-  }, [price,priceError]);
+  }, [price, priceError]);
   const supplyRequire = useCallback(() => {
     if (!Number(quantity)) setsupplyError('Enter a price');
-    if (Number(quantity) <= specificNft.remainingSupply) setsupplyError(`you have ${specificNft.remainingSupply}`);
-  }, [quantity,supplyError]);
+    if (Number(quantity) <= specificNft.remainingSupply)
+      setsupplyError(`you have ${specificNft.remainingSupply}`);
+  }, [quantity, supplyError]);
 
-  const reSell = useCallback(() => {
+  const reSell = useCallback(async () => {
     setresellLoading(true);
 
-    if (!price || !quantity  ) {
+    if (!price || !quantity) {
       setresellLoading(false);
-      alert('please fill up all field');
+      toast.warning({ message: 'please fill up all field' });
+      return;
     }
     try {
-      const response = dispatch(
+      const response = await dispatch(
         reSellNft({
           tokenId: Number(specificNft.tokenId),
           quantity: Number(quantity),
           newPrice: Number(price),
         }),
-      ).unwrap();
+      );
       setQuantity('');
       setPrice('');
       console.log('response', response);
@@ -60,32 +63,33 @@ const ListInView = ({ setIsModalOpen, specificNft }: ListInViewProps) => {
     } finally {
       setresellLoading(false);
     }
-  }, [price,quantity,resellLoading]);
+  }, [price, quantity, resellLoading]);
 
-  const startAuction = useCallback(() => {
+  const startAuction = useCallback(async () => {
     setresellLoading(true);
 
-    if (!startingBid || !duration  ) {
+    if (!startingBid || !duration) {
       setresellLoading(false);
-      alert('please fill up all field');
+      toast.warning({ message: 'please fill up all field' });
+      return;
     }
     try {
-      const response = dispatch(
+      await dispatch(
         startAuctionNft({
           tokenId: Number(specificNft.tokenId),
-          minPrice:Number(startingBid),
-          auctionDuration:Number(duration)
+          minPrice: Number(startingBid),
+          auctionDuration: Number(duration),
         }),
-      ).unwrap();
-      setDuration("");
-      setStartingBid("");
-      console.log('response', response);
-    } catch (error) {
-      console.log(error, 'relist failed');
+      );
+      setDuration('');
+      setStartingBid('');
+      toast.success({ message: 'Auction Start',options:{position:"top-center"} });
+    } catch {
+      toast.error({ message: 'Failed to relist' });
     } finally {
       setresellLoading(false);
     }
-  }, [startingBid,duration,resellLoading]);
+  }, [startingBid, duration, resellLoading]);
 
   return (
     <motion.div
@@ -160,7 +164,7 @@ const ListInView = ({ setIsModalOpen, specificNft }: ListInViewProps) => {
 
           <Button
             title="List"
-            handleClick={activeTab === "Fixed" ? reSell :startAuction}
+            handleClick={activeTab === 'Fixed' ? reSell : startAuction}
             othercss="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600 transition"
           />
         </div>

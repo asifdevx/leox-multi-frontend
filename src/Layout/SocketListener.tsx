@@ -1,13 +1,19 @@
 import { AppDispatch } from '@/components/store/store';
 import { addBidEvent, updateBidder } from '@/reducer/BuySlice';
 import { fatchFee } from '@/reducer/feeSlice';
-import { addNewNFT, updateAuctionEnd, updateBidInfo, updateListing } from '@/reducer/nftSlice';
+import {
+  addNewNFT,
+  updateAuctionEnd,
+  updateBidInfo,
+  updateListing,
+  updateUnListed,
+} from '@/reducer/nftSlice';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { io } from 'socket.io-client';
 
-const socket = io(`wss://leox-backend.onrender.com`, {
-// const socket = io(`http://192.168.19.43:8000`, {
+// const socket = io(`wss://leox-backend.onrender.com`, {
+const socket = io(`http://192.168.1.100:8000`, {
   withCredentials: true,
   transports: ['websocket'],
 });
@@ -59,8 +65,8 @@ export default function SocketListener() {
           dispatch(addNewNFT(buyerNFT));
         }
       }
-
-      dispatch(updateBidder({ tokenId, seller, bidder: caller, claim: true }));
+      if (!caller === seller)
+        dispatch(updateBidder({ tokenId, seller, bidder: caller, claim: true }));
     });
     socket.on('BidRefunded', (data) => {
       if (!data.tokenId || !data.seller || !data.caller) return;
@@ -74,7 +80,17 @@ export default function SocketListener() {
         }),
       );
     });
-
+    socket.on('unListed', (data) => {
+      const { tokenId, seller, isListed } = data;
+      if (!tokenId || !seller || isListed === undefined) return;
+      dispatch(
+        updateUnListed({
+          tokenId,
+          seller,
+          isListed,
+        }),
+      );
+    });
     return () => {
       socket.off('updateFee');
       socket.off('newNFTListed');
@@ -82,6 +98,7 @@ export default function SocketListener() {
       socket.off('TokenBought');
       socket.off('AuctionClaimed');
       socket.off('BidRefunded');
+      socket.off('unListed');
     };
   }, [dispatch]);
   return null;

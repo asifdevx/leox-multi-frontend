@@ -71,6 +71,7 @@ declare type customBtnProps = {
   othercss: string;
   handleClick?: () => void;
   loading?: boolean;
+  disable?: boolean;
   isLink?: boolean;
   linkUrl?: string;
   icon?: ReactNode;
